@@ -115,7 +115,20 @@ now execute sh /etc/initial_setup.sh
 
 
 
+
+package management
+------------------
+I want to create a package repository of all the packages I want to
+use on a jail, then be able to drag those packages onto my nice shiny
+new jail and install them quickly.  I will also want to be able to
+update the packages (reasonably) frequently.
+
+
+so ...
+
   
+making packages
+---------------
 
 
 .. [#] http://jcooney.net/archive/2007/02/01/42999.aspx.  Its funny. see also http://www.codinghorror.com/blog/archives/000818.html. 
