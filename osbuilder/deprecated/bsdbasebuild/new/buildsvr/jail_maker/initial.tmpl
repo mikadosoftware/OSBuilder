@@ -1,0 +1,15 @@
+#!/bin/sh
+
+### pbrian
+
+### Firstly set the root passwd
+passwd
+
+### now setup ntp correctly
+echo current date is `date`
+## No point in putting ntp onto jails - can only run from host
+cp /usr/share/zoneinfo/Europe/London /etc/localtime
+adjkerntz -a
+echo new current date is `date`
+
+

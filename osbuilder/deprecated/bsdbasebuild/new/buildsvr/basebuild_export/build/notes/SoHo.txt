@@ -1,0 +1,33 @@
+Test IPs
+
+bbc.co.uk   212.58.251.207
+google.com  64.233.183.104
+
+
+IP - 87.127.197.222
+-------------------------
+Username: paul1brian
+Password: 1801809c
+-------------------------
+Username: paul1brian@gmail.com
+Password: 34d99792
+-------------------------
+
+It seems that if on the Draytek router I go to
+ Advanced Setup > NAT Setup > DMZ Host Setup 
+then I can set my PC (192.168.1.11) to be in DMZ - and it seems that the above IP which is the IP for the router
+every setting gets forwarded
+
+Seems odd - would like a better router..
+
+
+MAIL
+http://bsdinn.com/postfix/index.php?page=SB01
+http://www.linuxjournal.com/article/7778
+http://www.sysdesign.ca/guides/secure_pop3.html
+http://my-tech-diary.blogspot.com/2007/11/amavisclamavspamassassin-setup-in.html
+
+blackberry
+http://www.blackberryforums.com/rim-software/680-faq-what-methods-receiving-email-blackberry.html
+http://www.sysdesign.ca/guides/secure_pop3.html
+

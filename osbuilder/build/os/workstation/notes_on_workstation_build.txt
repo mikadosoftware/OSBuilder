@@ -1,0 +1,36 @@
+Workstation
+===========
+
+THis is how I build my workstation and hopefully keep it all up todate
+
+1. intial build
+2. ports auto builder
+3. keeping ports and source uptodate
+4. other code
+5. python
+
+
+MySQL-QUery-browser
+-------------------
+download the source tarball from mysql.com, then run configure
+I obviously require GNOME...
+x11/gnome2-lite/
+
+thius seems to require me to build
+/usr/ports/sysutils/libcdio
+first and seperate - perhaps not in port descrt
+
+
+ok - goto /var/db/ports/gvfs, kill the options file (or amend it) and rerun config
+and do not have cdda support (which requires libcdio which does not work)
+
+
+
+choosing a Xterm
+----------------
+start with a comprehensive comparison
+http://martin.ankerl.com/2007/09/01/comprehensive-linux-terminal-performance-comparison/
+go with eterm or gnometerminal
+
+mysql-wrapping issue ...
+
