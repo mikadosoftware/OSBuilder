@@ -129,7 +129,38 @@ so ...
   
 making packages
 ---------------
-???
+vist /usr/ports/xxx/yyy
+make package-recursive
+
+make package-recursive FORCE_PKG_REGISTER=YES
+
+snippet from bsd.port.mk ::
+
+ package-recursive: package
+         @for dir in $$(${ALL-DEPENDS-LIST}); do \
+                 (cd $$dir; ${MAKE} package-noinstall); \
+         done
+
+It seems to my eye that only the first port is (re)-installed the rest are 
+left alone.
+
+I think that this could be improved - I would like to see a make package-recursive-noinstall
+
+the diff is::
+
+ package-recursive: package
+
+ package-recursive: package-noinstall
+
+
+
+makefile that is included at end of *every* ports Makefile:
+/usr/ports/Mk/bsd.port.mk
+
+system make files...??
+
+
+
 
 .. [#] http://jcooney.net/archive/2007/02/01/42999.aspx.  Its funny. see also http://www.codinghorror.com/blog/archives/000818.html. 
 
