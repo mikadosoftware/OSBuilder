@@ -1,5 +1,7 @@
 #!/bin/sh
 
+## pbrian@itmanagerscookbook.com
+
 # every time we build from port, a pkg is created, and build info stored 
 # in /var/db/pkgs
 # distfiles in /usr/ports/disfiles
@@ -31,4 +33,5 @@ do
 done
 
 echo `$dd` Fin. >> $log
+
 
