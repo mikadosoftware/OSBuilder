@@ -124,7 +124,16 @@ new jail and install them quickly.  I will also want to be able to
 update the packages (reasonably) frequently.
 
 
-so ...
+There are two methods:
+
+1. use make package
+   This is the 'proper' route, however it forces you to build the package 
+   (again).  There is a patch but frankly its not a good idea.
+2. use pkg_create
+   This is part of portsutils and creates a binary package from the 
+   existing build (so you need to be sure you *did* create the package first)
+
+
 
   
 making packages
@@ -160,7 +169,27 @@ makefile that is included at end of *every* ports Makefile:
 system make files...??
 
 
+A Package Build Server
+----------------------
+As a simpler approach I will just build a Jail, then mount the host ports tree
+onto that jail::
 
+  $ mount_nullfs /usr/ports /usr/jail/$jail/usr/ports
+
+At this point I need to adjust a couple more  things. 
+The jail will read from host ports tree, but it should not alter them.  If we read man(8) ports
+we can find two useful settings
+
+1. WKDIRPREFIX - set this in /etc/make.conf and the building of the ports will happen there.::
+
+   mkdir -p /usr/local/var/portsbuild
+   echo WKDIRPREFIX=/usr/local/var/portsbuild >> /etc/make.conf
+   echo PACKAGES=/usr/local/var/portsbuild/packages >> /etc/make.conf
+
+
+next is check pkg buold then get clean jail to install them
+
+   
 
 .. [#] http://jcooney.net/archive/2007/02/01/42999.aspx.  Its funny. see also http://www.codinghorror.com/blog/archives/000818.html. 
 
