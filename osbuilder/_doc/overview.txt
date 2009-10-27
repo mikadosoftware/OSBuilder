@@ -2,53 +2,150 @@
 Building FreeBSD from scratch to Jails to Packages
 ==================================================
 
-This is a discussion and how-to on *my* way to build and maintain FreeBSD in a production environment with as little manual overhead as one can reasonably get away with.
+I hate deployment problems.  I hate sitting there thinking why did it
+work in test and now is blown up on live.  I hate it because it
+*should* be so simple, I hate it because it makes the hard work in the
+code look worthless and unprofessional and most of all I hate it
+because it *destroys confidence* - the confidence the developers have
+that when they finish some code it will work in real life, the
+confidence the business has that we can actually deliver something
+working smoothly and my confidence. In pretty much all of the above.
 
-(It does not cover *server monitoring* a very different kettle of fish - we are concerned here with installation and initial setup)
+I don't have a perfect solution - just a *good enough* solution.  To me
+the answer is to make sure, really sure, that you are developing on the 
+same software as you test as you deploy live.  This is not the same as
+using one machine - but using different machines, all of which have the
+same versions of the same software.
 
-In short this is going to describe how to install FreeBSD onto a host machine, update it to the latest security patches, build a set of Jails ontop of the host and then build a package repository of important ports.
+This leads to lots of nice benefits.  We can be confident of rebuilding
+in case of disaster, we can bring up new servers for testing easily and 
+quickly, and we get closer to that holy grail - continuous deployment
 
-The aim is to have a standardised build of servers, that can be kept up to date simply, can be configured as I like them and then provide a number of jails that can be torn down and rebuilt in minutes - making test environments feasible and less painful
+What is continuous deployment
+-----------------------------
+take some, code, check it in, have a seperate server deploy it on a clean
+server, from the repository, automatically.  Run the automated tests.  If 
+it passes, you *could* deploy live.  If not the line is halted, and the 
+person who checked in the failing code has to go and fix it.
+
+So how do we get there?
+
+Firstly, script pretty much everything.  No, Everything. 
+Second, make sure you know what has gone where. and third, standardise.
+Then we orry about running tests.
+
+For me the solution is to *standardise* how to build a server, from 
+the intial setup, patching and configuration.  Then I will be able 
+to rebuild that server as live, or staging or development.  With 
+that comes *confidence* that tests run on development will also pass
+later on.
+
+If I add FreeBSD Jails into the mix, I am able to create / destroy 
+a complete server, with databases or what have you,  from scratch
+ in minutes.  Making bringing up servers just to test a feasible 
+concept.
+
+This, along with automated tests, is all about building confidence.
+Confidence that we can create our systems from scratch in a disaster,
+confidence that tests run on one will run elsewhere (no 'it works on 
+my machine') and confidence that new methodologies like Scrum will
+not come unstuck on the engineering side. [#]_
 
 I do *not* subscribe to the idea of making an image of a server and
-then uninstalling and reinstalling that image ala dd/ghost/vmware
-etc.  Whilst virtual images and machines are useful (immensely so in
-VMWare style case) you still need to build the initial machine
-*first*.  And if you do that manually you are not checking the first
-build. A scripted build can demonstrate that it did what the script
-says. An imaged build is still only taken on trust that the first
-beuilder did it right.
+then uninstalling and reinstalling that image ala dd/ghost/vmware etc.
+Whilst virtual images and machines are useful (immensely so in VMWare
+style case) you still need to build the initial machine *first*.  And
+if you do that manually you are not checking the first build. A
+scripted build can demonstrate that it did what the script says. An
+imaged build is still only taken on trust that the first beuilder did
+it right.  Add to that the cost of maintenace.  If we want to patch 
+or alter the build, we need to make another image. Did we get that 
+right?  And what about slightly different builds - this one with 
+apache, this without.  I can read through a dozen build scripts
+but how do I verify that a dozen KVM images are what I expect?
+
+Further work
+------------
+- use of tripwire to watch for changes
+- use of pkg monitoring tools
+- use of deployment tool (fab) to record what went where
+- simple rules (ie no manual deployment)
 
 
-Overview
-========
+OSBUILDER
+=========
+OSBUILDER is merely a set of bash and python scripts that is 
+designed to automate the process of building standardised 
+BSD servers, keeping them up to date and so building confidence
+in our server architecture.
+
+It is less code, than process.  But it is probably important to note
+that the philosophy behind this is that without automation, without 
+a script to read, any process is pretty much useless.  It is the 
+argument against ghost'ed builds writ large - how can you be sure 
+that a manual process reliably built the same thing a dozen times.?
+
+
+
 
 Source tracking
 ---------------
-The FreeBSD project is unlike Linux as FreeBSD writes their own Kernel *and* Userland programs (like ls).  The whole set of code that comprises the FreeBSD userland and kernel is generally kept under / and then third party code is placed in a mirror of / under /usr/local
 
-The code that makes up the *source* for FreeBSD is released on CVS and is available to recompile - in fact it is simple to do so.  all one needs to do is to download the latest source files, and then make buildworld.
+The FreeBSD project is unlike Linux as FreeBSD writes their own Kernel
+*and* Userland programs (like ls, or top).  The whole set of code that
+comprises the FreeBSD userland and kernel is generally kept under /
+and then third party code is placed in a mirror of / under /usr/local
+
+The code that makes up the *source* for FreeBSD is released on CVS and
+is available to recompile - in fact it is simple to do so.  all one
+needs to do is to download the latest source files, and then run _make
+buildworld_.
 
 There are a few caveats of course...
 
-Firstly, which source files.  There are many many versions of the FreeBSD files, reflecting improvements in the code as time progresses.  Choosing which source to follow is at first a little confusing but I hope to simplify.
+Firstly, which source files.  There are many many versions of the
+FreeBSD files, reflecting improvements in the code as time progresses.
+Choosing which source to follow is at first a little confusing but I
+hope to simplify.
 
-The Release Engineering team at FreeBSD follow a fairly simple process.
-Every 18 mths they aim to release a major release (ie FreeBSD 5, 6, 7)
-Every 4 months they aim to release a minor release (ie FreeBSD 7.1, 7.2, 7.3)
+The Release Engineering team at FreeBSD follow a fairly simple
+process.  Every 18 mths they aim to release a major release (ie
+FreeBSD 5, 6, 7) Every 4 months they aim to release a minor release
+(ie FreeBSD 7.1, 7.2, 7.3)
  
-There are two parallel "branches" - CURRENT and STABLE for each *major* release.
-CURRENT is the very latest code - a developer has fixed or improved some code, made sure it works on their machine [#]_ and then they check the changes into CURRENT branch.
+There are three parallel "branches" - CURRENT and STABLE, and for each
+release there is a SECURITYFIX branch.  CURRENT is the very latest
+code - a developer has fixed or improved some code, made sure it works
+on their machine [#]_ and then they check the changes into CURRENT
+branch.
 
-After a while and some user community testing, the feature will be merged from CURRENT into STABLE, everyone confident that nothing has broken or seen any unsual feature interactions[#]_.
+After a while and some user community testing, the feature will be
+merged from CURRENT into STABLE, everyone confident that nothing has
+broken or seen any unsual feature interactions [#]_.
 
-Then the STABLE branch will be 'frozen', and all the small bugs knocked out of it and a minor release will be made.
+Then the STABLE branch will be 'frozen', and all the small bugs
+knocked out of it and a minor release will be made.
 
-After a minor release two things happen.  Every starts piling their code back into CURRENT, which means that a few days after a release the code base is suddenly much different from the code that was released and stable and tested a few days earlier.  In some cases the changes will be important security fixes, in other cases perhaps less important stuff.  
+After a minor release two things happen.  Every starts piling their
+code back into CURRENT, which means that a few days after a release
+the code base is suddenly much different from the code that was
+released and stable and tested a few days earlier.  In some cases the
+changes will be important security fixes, in other cases perhaps less
+important stuff.
 
-Now if you are after some 'must-have' new feature, thats great, but if you want to keep things steady and in production you do not want a whole bunch of fixes that might be wrong or just interact badly.
+Now if you are after some 'must-have' new feature, thats great, but if
+you want to keep things steady and in production you do not want a
+whole bunch of fixes that might be wrong or just interact badly.
 
-So they keep another branch - a Security fix branch, that is the nice, stable code that was released is kept free of most changes, and only important security fixes are added.  This is, for me, the branch to follow each time.  So there a 7.0 release, and there was a branch named RELENG_7_0.  this updated slowly and I could rebuild my source from this code and be confident that things would not suddenly break.  After the release of 7.1 I could take the new branch called RELENG_7_1 and get any goodies they have worked on a proved, and then just follow RELENG_7_1 source for security fixes till the next release.
+So they keep another branch - a Security fix branch, that is the nice,
+stable code that was released is kept free of most changes, and only
+important security fixes are added.  This is, for me, the branch to
+follow each time.  So there a 7.0 release, and there was a branch
+named RELENG_7_0.  this updated slowly and I could rebuild my source
+from this code and be confident that things would not suddenly break.
+After the release of 7.1 I could take the new branch called RELENG_7_1
+and get any goodies they have worked on a proved, and then just follow
+RELENG_7_1 source for security fixes till the next release.
 
 Link for more information:  http://www.freebsd.org/releng/
 
@@ -61,28 +158,156 @@ Link for more information:  http://www.freebsd.org/releng/
 
 
 Initial Build 
--------------
-cvsup to mergemaster
+------------- 
+
+In OSBUILDER there is a script called cvsup2mergemaster.  I shall walk
+you through this quickly.  It is designed to be run first thing after
+FreeBSD has been installed on baremetal.  The idea is to take a .iso
+cd, install it onto a bare metal machine and then run this script.
+(Ok, the actual idea is to PXE boot the machine, but that will come later)
+It looks up which branch you wish to follow in the config, then downloads
+the lastest source (FreeBSD source code - for the Kernel *and* the userland)
+and then the ports trees,
+
+Next it does 'buildworld' - this takes the latest source code from
+FreeBSD and compiles it all - kernel, userland and the kitchen sink,
+then swaps out the old binaries for the new stuff.  Suddenly your base
+system is brand-spanking new. Finally it runs a useful piece of code
+called mergemaster, which runs a diff over the etc files you used to
+have and the new suggested ones.  
+
+Imagine you ahve a piece of software called foo and in foo.config you
+have set bar=100, 5 times the original default setting.  The new
+version of foo comes out and you compile the source code, and get the
+latest binary.  In it it has an amazing new feature splum.  By default
+splum=on is set in the default foo.config file the BSD developers give out.
+That is great, but it would overwrite your bar=100 setting back down
+to 20.  Mergemaster will notice the difference and ask if you want to
+merge the default one from FreeBSD with your altered version.
+
+On the first run of a clean untouched system, its *good enough* to run
+as an automatic yes to all changes.
+
+
+Packages 
+-------- 
+
+Thats all fine, but what about third-party applications, like Apache
+or MySQL.  These are built from the ports collection, which is, simply
+put, a Make file and a URL ro download the source appropriate for the
+Make file.
+
+I want to repeatedly install ports.  Now I *could* get each machine to
+build the port again and again (ie each machine that has apache in
+devel, test and live would build apache).  This seems wasteful, and if
+the external source is changed in between it is feasible to have
+different versions on different machines.  Exactly what I am trying to
+avoid.
+
+So we come to packages - these are binary versions of the fully
+compiled port.  They can install as fast as any other binary, meaning
+that I can build my copy servers quiclkly and reliably. 
+
+_port_builder.sh_ is the script that runs this - it takes as an argument
+a file that holds a variable called $list holding the names of the ports 
+::
+
+  list="lang/python devel/git"
+
+From this port_builder will ask you to fill in the options required (yes these needs automating) then it will  recursively build the port and then make packages.
+
+So I have a process for building a port, then building a package after it.
+Any new machine afterwards will ask for the package and install that, ensuring
+every machine is the same.
+
+There are only a couple of things left.  Firstly how does each machine get the 
+packages that have just been built, and second, I cannot have this many machines lying around the place.
 
 Jails
 -----
+FreeBSD Jails are the native approach to *virtualisation*.  FreeBSD jails are a (relatively) simple concept - you can run many instances of FreeBSD ontop of one FreeBSD host.  Each instance is called a Jail.  To simplify, the kernel marks a process running in jail 1 with a flag (ie 1) so that the kernel will not allow any process in jail 1 to interact with a process with any other numbered flag. 
+
+
 Building one jail
 ~~~~~~~~~~~~~~~~~
 
+There are plenty of desriptions of how to build a jail - here is mine.
+jailbuilder is the script(s) for this.  The concepts first.  Take the
+current userland binaries on the host machine.  Copy them to
+/usr/jail/<jailname>.  Alter rc.conf and then alter the /etc/ files
+that are now in /usr/jail.
 
+start up the jail using FreeBSD command jail
+
+climb into the jail, set passwords and then, you are in a completely
+clean FreeBSD system - pull down packages and install.
+
+The python scripts with jailbuilder are designed to try and help the
+configuration.
 
 Killing one jail
 ~~~~~~~~~~~~~~~~
 
 
+Final configuration - Bombes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A Bombe is a pretty silly name for a script (I think it most will become a
+python script) that will pull down a package, install it, then do all
+the configuration necessary - for example set up passwords, alter my.conf
+etc.  Whatever we write it to do.
+
+I suspect it will look a bit like fabfile, but will work locally.  And
+no, there is no particular reason I am not using fabfile.  Its
+probably the itch.  Actually no its not - I want to understand the
+issues surrounding this important area - that is why I am not using
+ezjail, or using fabfile for (much) deployment.  I want to understand
+how it all works.  And this is not an argument for writing everything
+yourself - it is an argument for knowing what is base, essential and
+vital, and making yourself aware of those things.
+
+Bombes are also expected to exist in th Build stage - configuring a
+firewall for example, or tripwire.  The idea is that once the basic
+build is scripted I can then work on each little *extra* until the
+whole is quite sophisticated.
+
+
+Deploy, install, configure
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+I am using these three words inter-changeably - and I should stop.  I
+think it is important to differentiate between stages of the creation
+of a server.  These are my defintions.
+
+- Build.  Building an OS, like FreeBSD, to be a clean build. It will
+  include some essentials like firewall and tripwire.
+
+- Install.  Install a third party application like Apache.  the
+  configuration of such comes in here too.
+
+- Deploy.  Install and configure *my own code* - not third party stuff
+but "what I wrote".
+
+Bombes, scripts and so on will be a necessary part of all the above.
+
 
 Package repository
 ~~~~~~~~~~~~~~~~~~
+The command make package will build a binary package from an existing 
+port install.  It then stores that in PACKAGES - which is usually 
+/usr/ports/packages. (see 'A Package Build Server') 
+
+makefile that is included at end of *every* ports Makefile:
+/usr/ports/Mk/bsd.port.mk
 
 
-Now we have a Package repository, we need to use it.
-This is quite simple.  If we know that we want to install, say, subversion-1.6.1
-becuase that is the package we built, we set one environment variable::
+The package repository will have a directory called 'All'.  This will
+hold all the .tbz files we have built. 
+
+Now we have a Package repository, we need to use it.  This is quite
+simple.  If we know that we want to install, say, subversion-1.6.1
+becuase that is the package we built, we set one environment
+variable::
  
   setenv PACKAGESITE ftp://ftp/PACKAGES/All/
 
@@ -90,7 +315,8 @@ and then run on the target machine ::
 
   pkg_add -r subversion-1.6.1
 
-it will then look in the directory All for the tbz (package) of subversion, *and* any tbz's of ports that subversion depends on.  
+it will then look in the directory All for the tbz (package) of
+subversion, *and* any tbz's of ports that subversion depends on.
 
 To remove the environment variable setting,::
 
@@ -114,82 +340,35 @@ Now find the JID of the given machine, using jls then run
 now execute sh /etc/initial_setup.sh
 
 
-
-
-package management
-------------------
-I want to create a package repository of all the packages I want to
-use on a jail, then be able to drag those packages onto my nice shiny
-new jail and install them quickly.  I will also want to be able to
-update the packages (reasonably) frequently.
-
-
-There are two methods:
-
-1. use make package
-   This is the 'proper' route, however it forces you to build the package 
-   (again).  There is a patch but frankly its not a good idea.
-2. use pkg_create
-   This is part of portsutils and creates a binary package from the 
-   existing build (so you need to be sure you *did* create the package first)
-
-
-
-  
-making packages
----------------
-vist /usr/ports/xxx/yyy
-make package-recursive
-
-make package-recursive FORCE_PKG_REGISTER=YES
-
-snippet from bsd.port.mk ::
-
- package-recursive: package
-         @for dir in $$(${ALL-DEPENDS-LIST}); do \
-                 (cd $$dir; ${MAKE} package-noinstall); \
-         done
-
-It seems to my eye that only the first port is (re)-installed the rest are 
-left alone.
-
-I think that this could be improved - I would like to see a make package-recursive-noinstall
-
-the diff is::
-
- package-recursive: package
-
- package-recursive: package-noinstall
-
-
-
-makefile that is included at end of *every* ports Makefile:
-/usr/ports/Mk/bsd.port.mk
-
-system make files...??
-
-
 A Package Build Server
 ----------------------
+This is how I use a jail to run clean builds of packages that can then 
+be used through the rest of the system.
+
 As a simpler approach I will just build a Jail, then mount the host ports tree
 onto that jail::
 
   $ mount_nullfs /usr/ports /usr/jail/$jail/usr/ports
 
-At this point I need to adjust a couple more  things. 
-The jail will read from host ports tree, but it should not alter them.  If we read man(8) ports
-we can find two useful settings
+At this point I need to adjust a couple more things.  The jail will
+read from host ports tree, but it should not alter them.  If we read
+man(8) ports we can find two useful settings
 
-1. WKDIRPREFIX - set this in /etc/make.conf and the building of the ports will happen there.::
+1. WKDIRPREFIX - set this in /etc/make.conf and the building of the
+ports will happen there.::
 
    mkdir -p /usr/local/var/portsbuild
    echo WKDIRPREFIX=/usr/local/var/portsbuild >> /etc/make.conf
-   echo PACKAGES=/usr/local/var/portsbuild/packages >> /etc/make.conf
+   echo PACKAGES=/usr/local/var/portsbuild/packages >> /etc/make.conf   
+   echo DISTDIR=/usr/local/var/portsbuild/distfiles >> /etc/make.conf
+
+Now if I run as normal my make install, make package commands, the
+jail build server will not alter /usr/ports but will store all changes
+under /usr/local/var/portsbuild.
 
 
-next is check pkg buold then get clean jail to install them
 
-   
+.. [#] Scrum and other XP goodies, usually claim 'how many projects do you know failed for technical reasons.'  The rationale is that if a project to implement an accounts system failed, its not because no-one knows how to build an accounts system.  This is a little disingenuous.  In my experience systems fail because the business side loses confidence in the ability of the engineering to deliver.  And that is often down to the lack of things like continuous integration.     
 
 .. [#] http://jcooney.net/archive/2007/02/01/42999.aspx.  Its funny. see also http://www.codinghorror.com/blog/archives/000818.html. 
 
