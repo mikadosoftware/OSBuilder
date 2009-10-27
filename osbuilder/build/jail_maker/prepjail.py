@@ -14,6 +14,12 @@ This will prepare the host for jail duty.
 
 Some (all) of this can be awkward, so I may leave some parts for manual
  
+TODO
+----
+
+- make the removal of a jail smoother (rc.conf etc)
+
+
 '''
 import sys
 import datetime
