@@ -1,0 +1,138 @@
+Capabilites (sysadmin Projects)
+
+DNS
+        Have full control over zone files for own domains
+        Run a internal name server, for intenral dns (ie office.domain.tld).
+
+Disaster Recovery
+        Able to create the entire server network, from baremetal + svn in 4 hours
+        Able to create 1 client workstation of each type (ie laptop, mobile,
+workstn) from baremetal in 4 hours
+        Perform Daily rebuilds of Beta network from baremetal, to test our
+abilkity, and our functional tests
+
+MS Terminal Services
+        ???
+
+Office Physical Env
+        Recycling
+        Asset Database
+        Strong cable management
+        Electrical mgmgt
+
+Printing
+        Printers on separate vlan
+        Printers run off single spooler, able to monitor, log and prioriitise jobs
+        Printers logged remotely for status (toner, paper)
+        Default print out is 2 page, draft mode
+        everyone can see website with how much has been printed
+
+Phone
+        Log of all calls in and out, mobile and landline
+        ?record calls
+        VoIP - asterix (future)
+
+Samba
+        Windows based clients have access to secure, shared filesystem
+        Each user has home directory, each dept has shared filesystem
+        Tools and trianing for monitoring, status checks, common problems like
+loss of domain ticket, corruption of profile.
+        How to monitor size of profiles (tool to list largest files, python run
+as walk?)
+
+Email
+        RFC822 compliant servers allowing in and out transmission of email from
+one or more domains
+        use of thunderbird client - incld cusoitmisation (kb.mozillazine.org),
+esp storeage of local folders outside windows user profile
+        Virus scanning og email on send / recv
+        bloclking emails from blacklisted
+        Server based flagging of spam
+        client spam filters
+        moderated distribution lists
+        IMAP email drop - allows easier synchnoisation of email clients
+        web mail access
+        mobile email access using imap and ssl
+        Log of all mails
+Calendering
+        Central server holding diary, journal entries for all users
+        Server accesible via web and ical protocols
+        we should have at least one desktop client able to use ical
+        We should look into funambol
+        Users can authenticate against LDAP
+
+Contact mgmt
+        Log all emails and phone calls
+        shared address book, avail via desktop clients as well
+        Can add a note to an ongoing contact (ie pohone call or meeting)
+
+Doc Mgmt
+        CompanyInfo docs - storage and indexing of documents related to company
+research
+        Other document mgmg - wide scale scanning and indexing of documents ie
+letters
+
+Accounts
+        Simple pre-purchase RFQ system - can hold quotes for at least 3 diff
+items perf sanme function
+        Simple PO system - web based allowing entry of details and generate PO
+that needs to be signed off
+        simple goods in system
+        Interface to sage
+        Regular backups and restore of sage dbase
+
+Base server
+        We can create base servers in Freebsd, fixing things like sshkeys, sudo etc
+
+Server security
+        Remote syslogging
+        tripwire
+        ssh shared keys, pexpect
+        passwords - generated automatically, must pass Crack etc
+        patch mgmt
+        log monitoring - who what how
+        setup of tutorials on how to create own soho network
+
+Change Control
+        all config files for all servers under svn control - any changes to
+(BETA) servers are kept in svn
+        can we filter svn to replace keywords
+        ALL CHANGES MUST PASS TESTS ON BETA NETWORK FIRST
+        grep svn to see change log?
+
+Bugtracking
+        what is a bug vs project task?
+        use of bugz or bugzilla?
+
+sourcecontrol
+        windows/linux issue
+
+Connectivity/Firewall
+        leased line with dsl failover
+        main firewall has heartbeat hot swap (each can bring up own NIC as others
+IP)
+        ipfw acts as natd for most, DMZ provider for rest
+        VPN: pptp for windows machiens ans windows mobiles
+        (www.schneier.com/pptp-faq.html) - use v strong passwords and rotate
+regulalrly - hash of todays date and shared random sequence?
+        log monitoring?
+
+Web sites
+        pirc.co.uk
+        ecgs.co.uk
+        lapfforum.org
+
+conference dbase
+        Simple flat table stored on main dbase and useable via access dbase
+
+Sales tender dbase
+        see conf dbase?
+
+Yearbook
+        Outsource to Dr Albert Lucasewski
+
+Mediawiki
+        should install cleanly in Fedora Core 5
+
+
+

@@ -1,0 +1,57 @@
+2008-04-21T15:05:13 Starting lang/python
+2008-04-21T15:08:42 Starting shells/bash
+2008-04-21T15:14:13 Starting sysutils/screen
+2008-04-21T15:14:46 Starting devel/subversion
+2008-04-21T15:29:15 Starting security/sudo
+2008-04-21T15:29:40 Starting devel/apr
+2008-04-21T21:48:40 Starting www/apache22
+2008-04-21T21:51:46 Starting databases/mysql51-server
+2008-04-21T22:03:45 Starting databases/mysql51-client
+2008-04-21T22:05:54 Starting databases/py-MySQLdb
+2008-04-23T11:44:12 Starting lang/python
+2008-04-23T11:47:34 Starting shells/bash
+2008-04-23T11:52:55 Starting sysutils/screen
+2008-04-23T11:53:26 Starting devel/subversion
+2008-04-23T12:08:00 Starting security/sudo
+2008-04-23T12:08:17 Starting www/apache22
+2008-04-23T12:54:34 Starting databases/mysql51-server
+2008-04-23T13:12:47 Starting databases/mysql51-client
+2008-04-23T13:14:58 Starting databases/py-MySQLdb
+2008-04-23T13:15:02 Fin.
+2008-04-23T15:40:35 Starting x11/xorg
+2008-04-23T16:45:59 Starting x11-wm/xfce4
+2008-04-23T17:13:36 Starting print/teTeX
+2008-04-23T17:54:18 Fin.
+2008-04-24T15:19:37 Starting devel/git
+2008-04-24T15:22:10 Fin.
+2008-04-25T11:54:58 Starting sysutils/cdrtools
+2008-04-25T11:56:20 Starting sysutils/agef
+2008-04-25T11:56:26 Starting sysutils/ascpu
+2008-04-25T11:56:30 Starting sysutils/battmond
+2008-04-25T11:56:31 Starting net-mgmt/flowd
+2008-04-25T11:56:43 Fin.
+2009-04-13T14:14:51 Starting lang/python
+2009-04-13T14:14:51 Starting devel/py-lxml
+2009-04-13T14:14:52 Starting shells/bash
+2009-04-13T14:15:02 Starting sysutils/screen
+2009-04-13T14:15:03 Starting devel/subversion
+2009-04-13T14:15:03 Starting security/sudo
+2009-04-13T14:15:35 Starting www/apache22
+2009-04-13T14:15:42 Starting devel/git
+2009-04-13T14:15:46 Starting databases/mysql51-server
+2009-04-13T14:15:53 Starting databases/mysql51-client
+2009-04-13T14:15:53 Starting databases/py-MySQLdb
+2009-04-13T14:15:55 Fin.
+2009-04-13T14:31:36 Starting lang/python
+2009-04-13T14:31:36 Starting devel/py-lxml
+2009-04-13T14:51:46 Starting shells/bash
+2009-04-13T14:56:18 Starting sysutils/screen
+2009-04-13T14:56:40 Starting devel/subversion
+2009-04-13T15:13:31 Starting security/sudo
+2009-04-13T15:13:54 Starting www/apache22
+2009-04-13T15:19:33 Starting devel/git
+2009-04-13T15:41:35 Starting databases/mysql51-server
+2009-04-13T15:43:17 Starting databases/mysql51-server
+2009-04-13T15:53:34 Starting databases/mysql51-client
+2009-04-13T15:55:39 Starting databases/py-MySQLdb
+2009-04-13T15:55:43 Fin.

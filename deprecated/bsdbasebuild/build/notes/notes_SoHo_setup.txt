@@ -1,0 +1,15 @@
+I often get problems with my router failing to act as a proper 
+caching nameserver.
+
+pbrian# dig www.google.co.uk
+;; reply from unexpected source: 195.74.113.58#53, expected 192.168.1.1#53
+;; reply from unexpected source: 195.74.113.58#53, expected 192.168.1.1#53
+
+
+so I need to change my resolv.conf to ignore the router and go directly outside
+to a named.
+
+
+nameserver 195.74.113.58
+nameserver 195.74.102.146
+

@@ -1,0 +1,19 @@
+tr -d '\015' filename
+
+There's other ways to delete control-m besides embedding ^M:
+
+1) Using tr:
+
+tr -d '\015' filename
+
+2) Using sed:
+
+sed 's/'"$(printf '\015')"'$//g' filename
+
+
+Hi..to remove ^M, give the command :
+sed -e 's/^M//g' filename
+you will have to write the control-M as follows : first press control-V,then control-M,this will show the correct control-M on the command line.
+For removing the linefeeds,try this :
+sed -e 's/.$//g' filename
+this will remove the last character from the line,which happens to be the line feed.
