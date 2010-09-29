@@ -1,8 +1,0 @@
-*default tag=.
-*default host=cvsup3.uk.freebsd.org
-*default prefix=/usr
-*default base=/var/db
-*default release=cvs delete use-rel-suffix compress
-
-ports-all
-doc-all
