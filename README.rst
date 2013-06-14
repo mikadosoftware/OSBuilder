@@ -1,3 +1,5 @@
+:desc: Build FreeBSD systems from scratch
+
 =========
 OSBUILDER
 =========
