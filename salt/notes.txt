@@ -1,0 +1,6 @@
+For compiling the dell
+
+-> change to VESA
+-> pkg conversion using salt bootstrap
+-> still not solved the xorg problem - comppile from source and see
+
