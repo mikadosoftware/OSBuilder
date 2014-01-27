@@ -1,6 +1,5 @@
-$MYTAR=
-$OSBUILDER=
-$WEBHOME=
+##
+# Getting saltstack
+# getting a masterless minion setup.
 
-tar -cf $MYTAR $OSBUILDER
-cp $MYTAR $WEBHOME
+

@@ -7,138 +7,103 @@ OSBUILDER
 Building FreeBSD installs from scratch.
 =======================================
 
-This is a simple, personal project to do SoHo quality level BSD installs 
-at home, to keep my servers up to date, without too much manual sysadmin.
+It is nearly 2014, and this system has built my personal workstations
+and a fair number of production / development servers for many years.
 
-THere are Jail setups, complete installs, buildworlds and more.
+However, it is showing its age (the code here still tries to use `CVS` for
+heaven's sake.) So I am revamping it, into the modern age of ... `saltstack`
 
-Does not use the new BSDInstall. I shall probably try migrating for the PXE part
-
-FOr the very basic install
-
-1. boot your machine from a USB drive, which has the bootonly.img from Freebsd
-2. install a barebones machine the usual way (PXE can replace this)
-3. fetch https://github.com/lifeisstillgood/OSBuilder/tarball/0.1.0 ./osbuilder.tar.gz
-4. extract
-5. ensure config/src-supfile points to RELENG_9 (or later)
-6. run cvsup_mergemaster.sh
-  
-this will totally rebuild machine to the current head of CVS RELENG_9 (ie stable)
-
-Then you can select the ports to install in portbuilder
+The aim is still the same - to build a viable, usable FreeBSD workstation 
+that allows me to "just get on with it".
 
 
-==================================================
-Building FreeBSD from scratch to Jails to Packages
-==================================================
-
-This is a discussion and how-to on *my* way to build and maintain FreeBSD in a production environment with as little manual overhead as one can reasonably get away with.
-
-(It does not cover *server monitoring* a very different kettle of fish - we are concerned here with installation and initial setup)
-
-In short this is going to describe how to install FreeBSD onto a host machine, update it to the latest security patches, build a set of Jails ontop of the host and then build a package repository of important ports.
-
-The aim is to have a standardised build of servers, that can be kept up to date simply, can be configured as I like them and then provide a number of jails that can be torn down and rebuilt in minutes - making test environments feasible and less painful
-
-
-Overview
-========
-
-Source tracking
+A few sidenotes
 ---------------
-The FreeBSD project is unlike Linux as FreeBSD writes their own Kernel *and* Userland programs (like ls).  The whole set of code that comprises the FreeBSD userland and kernel is generally kept under / and then third party code is placed in a mirror of / under /usr/local
 
-The code that makes up the *source* for FreeBSD is released on CVS and is available to recompile - in fact it is simple to do so.  all one needs to do is to download the latest source files, and then make buildworld.
+I have a few "must haves", a few "really really must haves" and 
+a couple of "OMG, I will die without".
 
-There are a few caveats of course...
+I discuss these here.
 
-Firstly, which source files.  There are many many versions of the FreeBSD files, reflecting improvements in the code as time progresses.  Choosing which source to follow is at first a little confusing but I hope to simplify.
+A workstation is no longer the be-all and end-all of a developer's world.
+The Personal Computer has given in to the Personal "Network is the Computer"
+and that has made many things more awkward as well as more valuable.
 
-The Release Engineering team at FreeBSD follow a fairly simple process.
-Every 18 mths they aim to release a major release (ie FreeBSD 5, 6, 7)
-Every 4 months they aim to release a minor release (ie FreeBSD 7.1, 7.2, 7.3)
- 
-There are two parallel "branches" - CURRENT and STABLE for each *major* release.
-CURRENT is the very latest code - a developer has fixed or improved some code, made sure it works on their machine [#]_ and then they check the changes into CURRENT branch.
+Basically that means I am not giving up my smartphone and need access to all
+my stuff on several different machines.  Which complicates life.
 
-After a while and some user community testing, the feature will be merged from CURRENT into STABLE, everyone confident that nothing has broken or seen any unsual feature interactions[#]_.
-
-Then the STABLE branch will be 'frozen', and all the small bugs knocked out of it and a minor release will be made.
-
-After a minor release two things happen.  Every starts piling their code back into CURRENT, which means that a few days after a release the code base is suddenly much different from the code that was released and stable and tested a few days earlier.  In some cases the changes will be important security fixes, in other cases perhaps less important stuff.  
-
-Now if you are after some 'must-have' new feature, thats great, but if you want to keep things steady and in production you do not want a whole bunch of fixes that might be wrong or just interact badly.
-
-So they keep another branch - a Security fix branch, that is the nice, stable code that was released is kept free of most changes, and only important security fixes are added.  This is, for me, the branch to follow each time.  So there a 7.0 release, and there was a branch named RELENG_7_0.  this updated slowly and I could rebuild my source from this code and be confident that things would not suddenly break.  After the release of 7.1 I could take the new branch called RELENG_7_1 and get any goodies they have worked on a proved, and then just follow RELENG_7_1 source for security fixes till the next release.
-
-Link for more information:  http://www.freebsd.org/releng/
+I also want to have a degree of expected security.
 
 
-- RELENG_7 - STABLE branch
-- RELENG_7_1 - errata (bug fix) branch - very stable, follow this in general
-- RELENG_7_1_0_RELEASE - tag for the actual release
+So I want :
 
 
+* Secure-ish
+* Reliable
+* Mobile
+* Configurable
+
+General idea:
+
+* use `freebsd-update` to keep the base system right
+* proper firewall use
+* use salt-stack to manage the application / ports layer
 
 
-Initial Build 
--------------
-cvsup to mergemaster
+First steps
+-----------
 
-Jails
------
-Building one jail
-~~~~~~~~~~~~~~~~~
+Install FreeBSD from .img
+COnfigure networking
 
+Next Steps
+----------
 
-
-Killing one jail
-~~~~~~~~~~~~~~~~
-
-
-
-Package repository
-~~~~~~~~~~~~~~~~~~
-
-
-Now we have a Package repository, we need to use it.
-This is quite simple.  If we know that we want to install, say, subversion-1.6.1
-becuase that is the package we built, we set one environment variable::
- 
-  setenv PACKAGESITE ftp://ftp/PACKAGES/All/
-
-and then run on the target machine ::
-
-  pkg_add -r subversion-1.6.1
-
-it will then look in the directory All for the tbz (package) of subversion, *and* any tbz's of ports that subversion depends on.  
-
-To remove the environment variable setting,::
-
-  unsetenv PACKAGESITE
-
-
-
-
-To create new jail
-------------------
+Build minimal `salt-ready` environment
 ::
+
+   ports fetch
+   build git, python
+   install salt
+   run the minions
+
+Easy way:
+
+   pkg_add -r python
+   
+
+
+
+List of things on the Laptop
+----------------------------
+
+* Latest, security patched, BSD sources / binaries for Kernel and Userland
+* Well thought out and configured third-party applications
+* A sensible way to manage those applications
+
+List of things strongly connected to the Laptop
+-----------------------------------------------
+
+* GSM->Ethernet adaptor
+* Wifi (Gulp - me, BSD and WiFi do not mix well)
+* X
+* emacs, ansi-colour terminals
+
+
+List of other things
+--------------------
+
+* contact management solution
+* VoIP / Skype
+
+
+
+
+Bibliography
+------------
   
-  sh makejail.sh <server> <ip>
+http://blog.mikadosoftware.com/2013/09/17/help-i-cannot-find-a-contact-manager-that-manages-my-contacts/
 
-this will run and set up xxx
+http://jcooney.net/archive/2007/02/01/42999.aspx.  Its funny. see also http://www.codinghorror.com/blog/archives/000818.html. 
 
-Now find the JID of the given machine, using jls then run
-
-  jexec <JID> /bin/sh
-
-now execute sh /etc/initial_setup.sh
-
-
-
-  
-
-
-.. [#] http://jcooney.net/archive/2007/02/01/42999.aspx.  Its funny. see also http://www.codinghorror.com/blog/archives/000818.html. 
-
-.. [#] http://en.wikipedia.org/wiki/Feature_interaction_problem - which is referenced from the wise article - http://the-programmers-stone.com/2008/06/23/dirty-little-secrets-response-to-grady-booch/
+http://en.wikipedia.org/wiki/Feature_interaction_problem - which is referenced from the wise article - http://the-programmers-stone.com/2008/06/23/dirty-little-secrets-response-to-grady-booch/
