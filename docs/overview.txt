@@ -2,13 +2,21 @@
 Building FreeBSD from scratch to Jails to Packages
 ==================================================
 
-This is a discussion and how-to on *my* way to build and maintain FreeBSD in a production environment with as little manual overhead as one can reasonably get away with.
+This is a discussion and how-to on *my* way to build and maintain FreeBSD in a
+production environment with as little manual overhead as one can reasonably get
+away with.
 
-(It does not cover *server monitoring* a very different kettle of fish - we are concerned here with installation and initial setup)
+(It does not cover *server monitoring* a very different kettle of fish - we are
+concerned here with installation and initial setup)
 
-In short this is going to describe how to install FreeBSD onto a host machine, update it to the latest security patches, build a set of Jails ontop of the host and then build a package repository of important ports.
+In short this is going to describe how to install FreeBSD onto a host machine,
+update it to the latest security patches, build a set of Jails ontop of the host
+and then build a package repository of important ports.
 
-The aim is to have a standardised build of servers, that can be kept up to date simply, can be configured as I like them and then provide a number of jails that can be torn down and rebuilt in minutes - making test environments feasible and less painful
+The aim is to have a standardised build of servers, that can be kept up to date
+simply, can be configured as I like them and then provide a number of jails that
+can be torn down and rebuilt in minutes - making test environments feasible and
+less painful
 
 
 Overview
@@ -16,30 +24,56 @@ Overview
 
 Source tracking
 ---------------
-The FreeBSD project is unlike Linux as FreeBSD writes their own Kernel *and* Userland programs (like ls).  The whole set of code that comprises the FreeBSD userland and kernel is generally kept under / and then third party code is placed in a mirror of / under /usr/local
 
-The code that makes up the *source* for FreeBSD is released on CVS and is available to recompile - in fact it is simple to do so.  all one needs to do is to download the latest source files, and then make buildworld.
+The FreeBSD project is unlike Linux as FreeBSD writes their own Kernel *and*
+Userland programs (like ls).  The whole set of code that comprises the FreeBSD
+userland and kernel is generally kept under / and then third party code is
+placed in a mirror of / under /usr/local
+
+The code that makes up the *source* for FreeBSD is released on CVS and is
+available to recompile - in fact it is simple to do so.  all one needs to do is
+to download the latest source files, and then make buildworld.
 
 There are a few caveats of course...
 
-Firstly, which source files.  There are many many versions of the FreeBSD files, reflecting improvements in the code as time progresses.  Choosing which source to follow is at first a little confusing but I hope to simplify.
+Firstly, which source files.  There are many many versions of the FreeBSD files,
+reflecting improvements in the code as time progresses.  Choosing which source
+to follow is at first a little confusing but I hope to simplify.
 
-The Release Engineering team at FreeBSD follow a fairly simple process.
-Every 18 mths they aim to release a major release (ie FreeBSD 5, 6, 7)
-Every 4 months they aim to release a minor release (ie FreeBSD 7.1, 7.2, 7.3)
+The Release Engineering team at FreeBSD follow a fairly simple process.  Every
+18 mths they aim to release a major release (ie FreeBSD 5, 6, 7) Every 4 months
+they aim to release a minor release (ie FreeBSD 7.1, 7.2, 7.3)
  
 There are two parallel "branches" - CURRENT and STABLE for each *major* release.
-CURRENT is the very latest code - a developer has fixed or improved some code, made sure it works on their machine [#]_ and then they check the changes into CURRENT branch.
+CURRENT is the very latest code - a developer has fixed or improved some code,
+made sure it works on their machine [#]_ and then they check the changes into
+CURRENT branch.
 
-After a while and some user community testing, the feature will be merged from CURRENT into STABLE, everyone confident that nothing has broken or seen any unsual feature interactions[#]_.
+After a while and some user community testing, the feature will be merged from
+CURRENT into STABLE, everyone confident that nothing has broken or seen any
+unsual feature interactions[#]_.
 
-Then the STABLE branch will be 'frozen', and all the small bugs knocked out of it and a minor release will be made.
+Then the STABLE branch will be 'frozen', and all the small bugs knocked out of
+it and a minor release will be made.
 
-After a minor release two things happen.  Every starts piling their code back into CURRENT, which means that a few days after a release the code base is suddenly much different from the code that was released and stable and tested a few days earlier.  In some cases the changes will be important security fixes, in other cases perhaps less important stuff.  
+After a minor release two things happen.  Every starts piling their code back
+into CURRENT, which means that a few days after a release the code base is
+suddenly much different from the code that was released and stable and tested a
+few days earlier.  In some cases the changes will be important security fixes,
+in other cases perhaps less important stuff.
 
-Now if you are after some 'must-have' new feature, thats great, but if you want to keep things steady and in production you do not want a whole bunch of fixes that might be wrong or just interact badly.
+Now if you are after some 'must-have' new feature, thats great, but if you want
+to keep things steady and in production you do not want a whole bunch of fixes
+that might be wrong or just interact badly.
 
-So they keep another branch - a Security fix branch, that is the nice, stable code that was released is kept free of most changes, and only important security fixes are added.  This is, for me, the branch to follow each time.  So there a 7.0 release, and there was a branch named RELENG_7_0.  this updated slowly and I could rebuild my source from this code and be confident that things would not suddenly break.  After the release of 7.1 I could take the new branch called RELENG_7_1 and get any goodies they have worked on a proved, and then just follow RELENG_7_1 source for security fixes till the next release.
+So they keep another branch - a Security fix branch, that is the nice, stable
+code that was released is kept free of most changes, and only important security
+fixes are added.  This is, for me, the branch to follow each time.  So there a
+7.0 release, and there was a branch named RELENG_7_0.  this updated slowly and I
+could rebuild my source from this code and be confident that things would not
+suddenly break.  After the release of 7.1 I could take the new branch called
+RELENG_7_1 and get any goodies they have worked on a proved, and then just
+follow RELENG_7_1 source for security fixes till the next release.
 
 Link for more information:  http://www.freebsd.org/releng/
 
